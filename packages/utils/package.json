@@ -1,0 +1,9 @@
+{
+    "name": "@repo/utils",
+    "version": "0.0.0",
+    "private": true,
+    "main": "./index.ts",
+    "dependencies": {
+        "date-fns": "^2.0.0"
+    }
+}

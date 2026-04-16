@@ -1,0 +1,13 @@
+{
+    "name": "@repo/database",
+    "version": "0.0.0",
+    "private": true,
+    "main": "index.ts",
+    "dependencies": {
+        "drizzle-orm": "^0.30.0",
+        "postgres": "^3.0.0"
+    },
+    "devDependencies": {
+        "drizzle-kit": "^0.20.0"
+    }
+}

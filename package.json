@@ -1,0 +1,23 @@
+{
+  "name": "taskmaster-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "build:portal": "turbo run build --filter=portal",
+    "build:admin": "turbo run build --filter=admin",
+    "dev": "turbo run dev",
+    "dev:portal": "turbo run dev --filter=portal",
+    "dev:admin": "turbo run dev --filter=admin",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  },
+  "devDependencies": {
+    "turbo": "latest",
+    "prettier": "latest",
+    "typescript": "^5.0.0"
+  },
+  "packageManager": "pnpm@8.0.0",
+  "engines": {
+    "node": ">=18"
+  }
+}
