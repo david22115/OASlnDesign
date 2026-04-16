@@ -13,7 +13,7 @@ Admin 專案是企業資訊主管 (IT) 與 HR 的核心管控後台。它也是�
     * 使用 **`TanStack React Query`** (或 SWR) 作為 API 遠端請求的標準工具，全權處理資料的 Cache、Retry (遇 API 斷線重試)、StaleTime 以及樂觀更新 (Optimistic UI)。
     * 使用 **`Zustand`** 作為純前端的全域狀態管理 (如側邊欄收合、使用者個人設定)，棄用 Redux 以減輕樣板代碼。
 * **並行開發 Mock 服務**：
-    * Phase 1 應即刻配置 **`msw (Mock Service Worker)`**。在後端 API 完備前，所有前端工程師應基於 `API_Contract_Spec.md` 攔截網路請求以進行 UI 互動開發。
+    * Phase 1 應即刻配置 **`msw (Mock Service Worker)`**。前端工程師應直接抓取 `apps/api` 產出之 Swagger/OpenAPI 規格文件，攔截網路請求以進行 UI 互動開發，不再互相等待。
 * **E2E 與整合測試**：
     * 針對極度敏感的「路由守衛 (Route Guard 放行能力)」與「AccessPolicy 設定面版」，必須導入 **`Playwright`** 進行自動化使用者流程端對端測試。
 * **程式碼品質與 Git 協作 (Code Quality)**：

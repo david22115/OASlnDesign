@@ -17,11 +17,11 @@ Portal 專案是整個企業 OA 系統的門面，主要承載員工的日常操
     * 導入 **`TanStack React Query`** (或 SWR) 作為 API 遠端請求的狀態管理工具，提供非同步載入畫面、請求去重與本地快取能力。
     * 輕量級客戶端全域狀態 (如淺/深色模式、已開啟彈窗紀錄) 交由 **`Zustand`** 統一打理。
 * **並行開發 Mock 服務**：
-    * 啟用 **`msw (Mock Service Worker)`**。在後端 API 尚未開發完成前，藉由攔截前端請求，使前端團隊得以完全依據合約開發。
+    * 啟用 **`msw (Mock Service Worker)`**。藉由攔截前端請求，使前端團隊得以完全依據 `apps/api` 提供之 Swagger 標準合約開發。
 * **高穩定性防護**：
     * 引進 **`Playwright`** 進行自動化 E2E 測試，重點覆寫「OAuth 跳轉流」與「Launchpad 九宮格根據權限正確渲染」的兩大關鍵邏輯。
 * **程式碼品質與 Git 協作 (Code Quality)**：
-    * 強制導入 `Husky` 做 Pre-commit Hook。
+    * 強制導入 `Husky` 做 Pre-commit Hook，拒絕不符規範的 Commit 流入 `OASlnDesign` 倉庫。
 * **CI/CD 自動化與部署**：
     * 配合 GitHub Actions，設定 PR 必須通過 Playwright 與 ESLint 檢查，協助前端部署至測試虛擬機環境。
 

@@ -15,7 +15,7 @@ API 專案是整個企業 OA 系統的「核心流程大腦」，負責攔截所
 * **資安與例外防護**：全應用強制啟用 `helmet` 與嚴格的 CORS 原則。實作全域錯誤中介層 (Global Exception Filter)，統一向前端吐回符合標準之 `RFC 7807 Problem Details for HTTP APIs` 錯誤格式，嚴禁洩漏 DB Schema。
 * **自動化測試策略**：採用 `Jest` + `Supertest` 進行 API 端點的整合測試，對於 AccessPolicy Engine 的判斷邏輯必須具備 80% 以上測試覆蓋率。
 * **程式碼品質與 Git 協作 (Code Quality)**：強制導入 `Husky` 做 Pre-commit Hook，確保推上 Github `OASlnDesign` 的程式碼絕對通過 ESLint 與 Prettier。
-* **CI/CD 自動化與部署**：配合 GitHub Actions，於發起 PR 時自動執行 `Jest`，並於 main 分支產生 `Dockerfile` Build 供虛擬機部署。
+* **CI/CD 自動化與部署**：配合 GitHub Actions，於發起 PR 時自動執行 `Jest`。並依據混和雲架構，將 API 引擎打包 `Dockerfile` 部署至 Serverless 平台 (如 Cloud Run)，將 Worker 打包部署至地端 K3s。
 * **可觀測性 (Observability)**：需整合 APM 工具（如 Datadog 或 Sentry 預留位），日後監控 Node.js 記憶體與 Slow Query。
 * **DevOps 環境分離**：必須維護 `.env.example` 並明確描述不同開發與正式環境 (Dev/Staging/Prod) 的環境變數隔離策略與第三方金鑰的預留位置。
 
