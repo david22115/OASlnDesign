@@ -1,5 +1,5 @@
 
-> web@0.0.0 build D:\project\my-fullstack-project\apps\web
+> portal@0.0.0 build D:\project\my-fullstack-project\apps\portal
 > next build
 
    ▲ Next.js 14.1.0
@@ -8,22 +8,23 @@
  ✓ Compiled successfully
    Linting and checking validity of types ...
    Collecting page data ...
-   Generating static pages (0/5) ...
-   Generating static pages (1/5) 
-   Generating static pages (2/5) 
-   Generating static pages (3/5) 
- ✓ Generating static pages (5/5) 
+   Generating static pages (0/6) ...
+   Generating static pages (1/6) 
+   Generating static pages (2/6) 
+   Generating static pages (4/6) 
+ ✓ Generating static pages (6/6) 
    Finalizing page optimization ...
    Collecting build traces ...
 
 Route (app)                              Size     First Load JS
-┌ ○ /                                    141 B          84.3 kB
-├ ○ /_not-found                          882 B            85 kB
-└ ○ /tailwind-demo                       141 B          84.3 kB
-+ First Load JS shared by all            84.1 kB
-  ├ chunks/37e723a9-a1e2a5bdaa70be75.js  53.4 kB
-  ├ chunks/887-8cad696a38a28063.js       28.9 kB
-  └ other shared chunks (total)          1.86 kB
+┌ ○ /                                    9.02 kB        93.2 kB
+├ ○ /_not-found                          882 B          85.1 kB
+├ ○ /login                               1.33 kB        85.5 kB
+└ ○ /tailwind-demo                       137 B          84.3 kB
++ First Load JS shared by all            84.2 kB
+  ├ chunks/37e723a9-e82e477b936fa14c.js  53.4 kB
+  ├ chunks/887-0e047ca77e70c7b0.js       28.9 kB
+  └ other shared chunks (total)          1.9 kB
 
 
 ○  (Static)  prerendered as static content

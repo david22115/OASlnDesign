@@ -1,5 +1,5 @@
 
-> web@0.0.0 build D:\project\my-fullstack-project\apps\web
+> admin@0.0.0 build D:\project\my-fullstack-project\apps\admin
 > next build
 
    ▲ Next.js 14.1.0
@@ -17,12 +17,12 @@
    Collecting build traces ...
 
 Route (app)                              Size     First Load JS
-┌ ○ /                                    141 B          84.3 kB
+┌ ○ /                                    1.21 kB        85.3 kB
 ├ ○ /_not-found                          882 B            85 kB
-└ ○ /tailwind-demo                       141 B          84.3 kB
+└ ○ /tailwind-demo                       137 B          84.3 kB
 + First Load JS shared by all            84.1 kB
-  ├ chunks/37e723a9-a1e2a5bdaa70be75.js  53.4 kB
-  ├ chunks/887-8cad696a38a28063.js       28.9 kB
+  ├ chunks/37e723a9-c5e28d071a9280d7.js  53.4 kB
+  ├ chunks/887-350c9fcc0a2d40f5.js       28.9 kB
   └ other shared chunks (total)          1.86 kB
 
 
