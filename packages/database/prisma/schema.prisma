@@ -1,0 +1,306 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// PORTAL MODELS (Core User & Org)
+/// 企業員工的全域身分檔。支援 MFA 多因素驗證。管理與其他系統模組的實體關聯。
+model EmployeeProfile {
+  id           String  @id @default(uuid())
+  employeeId   String  @unique
+  fullName     String
+  email        String  @unique
+  passwordHash String?
+  isMfaEnabled Boolean @default(false)
+  mfaSecret    String?
+  isActive     Boolean @default(true)
+
+  positions   EmployeePosition[]
+  roles       UserRole[]
+  preferences UserPreference?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+/// 動態組織樹 (Time-based Organization)。支援無限層級的子部門與一人多職的職掌追溯。
+model Department {
+  id       String  @id @default(uuid())
+  code     String  @unique
+  name     String
+  parentId String?
+  level    Int     @default(0)
+  isActive Boolean @default(true)
+
+  parent    Department?        @relation("DepartmentToDepartment", fields: [parentId], references: [id])
+  children  Department[]       @relation("DepartmentToDepartment")
+  positions EmployeePosition[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model EmployeePosition {
+  id            String    @id @default(uuid())
+  employeeId    String
+  departmentId  String
+  title         String
+  isPrimary     Boolean   @default(false)
+  effectiveDate DateTime  @default(now())
+  expireDate    DateTime?
+
+  Employee   EmployeeProfile @relation(fields: [employeeId], references: [id])
+  Department Department      @relation(fields: [departmentId], references: [id])
+
+  @@index([employeeId, departmentId])
+}
+
+// SSO Application & Launchpad
+/// 單一入口網 (EIP Portal) 註冊表。儲存微前端或外部系統跳轉的支援 (OIDC / Proxy) 與圖示設定。
+model Application {
+  id              String  @id @default(uuid())
+  code            String  @unique
+  name            String
+  iconCdnUrl      String?
+  entryUrl        String
+  authType        String // "OIDC" | "SAML" | "PROXY" | "DIRECT"
+  proxyConfig     Json?
+  globalSortOrder Int     @default(0)
+  isActive        Boolean @default(true)
+
+  policies AccessPolicy[]
+}
+
+model UserPreference {
+  id             String   @id @default(uuid())
+  employeeId     String   @unique
+  pinnedAppIds   String[]
+  dashboardOrder Json?
+
+  Employee  EmployeeProfile @relation(fields: [employeeId], references: [id])
+  updatedAt DateTime        @updatedAt
+}
+
+// ABAC Engine
+/// 系統角色 (RBAC 底層)。此角色可被 AccessPolicy 綁定，進而跨模組賦予細粒度的操作權限。
+model Role {
+  id        String         @id @default(uuid())
+  code      String         @unique
+  name      String
+  userRoles UserRole[]
+  policies  AccessPolicy[]
+}
+
+model UserRole {
+  id         String          @id @default(uuid())
+  employeeId String
+  roleId     String
+  Employee   EmployeeProfile @relation(fields: [employeeId], references: [id])
+  Role       Role            @relation(fields: [roleId], references: [id])
+
+  @@unique([employeeId, roleId])
+}
+
+/// 全域存取控制引擎 (ABAC)。負責控管全系統從文件、表單到應用程式端點的詳細 CRUD 操作權限。
+model AccessPolicy {
+  id           String @id @default(uuid())
+  resourceType String // "APPLICATION" | "DOCUMENT" | "WIDGET"
+  resourceId   String // ApplicationId, WidgetId, DocumentId
+  action       String // "READ" | "WRITE"
+
+  applicationId String?
+  roleId        String?
+  departmentId  String?
+  employeeId    String?
+  effect        String  @default("ALLOW")
+
+  createdAt DateTime @default(now())
+
+  Application Application? @relation(fields: [applicationId], references: [id])
+  Role        Role?        @relation(fields: [roleId], references: [id])
+
+  @@index([employeeId, resourceType, resourceId])
+  @@index([roleId])
+  @@index([departmentId])
+}
+
+model SystemAuditLog {
+  id           String   @id @default(uuid())
+  employeeId   String
+  action       String
+  resourceType String
+  resourceId   String
+  clientIp     String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+}
+
+// RefreshTokens
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+// BPM
+model BpmTaskCache {
+  id             String    @id @default(uuid())
+  employeeId     String
+  externalTaskId String
+  title          String
+  status         String
+  systemSource   String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  @@index([employeeId, status])
+}
+
+model PokeRecord {
+  id             String   @id @default(uuid())
+  fromEmployeeId String
+  toEmployeeId   String
+  externalTaskId String
+  pokedAt        DateTime @default(now())
+}
+
+// Attendance
+model ClockInRecord {
+  id           String    @id @default(uuid())
+  employeeId   String
+  clockType    String
+  deviceIp     String?
+  gpsLatitude  Float?
+  gpsLongitude Float?
+  wifiSsid     String?
+  isVerified   Boolean
+  syncStatus   String
+  createdAt    DateTime  @default(now())
+  deletedAt    DateTime?
+}
+
+// Announcement
+model Announcement {
+  id          String                @id @default(uuid())
+  title       String
+  content     String
+  authorId    String
+  isMustRead  Boolean               @default(false)
+  publishedAt DateTime              @default(now())
+  expiredAt   DateTime?
+  readLogs    AnnouncementReadLog[]
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  deletedAt   DateTime?
+}
+
+model AnnouncementReadLog {
+  id             String       @id @default(uuid())
+  announcementId String
+  employeeId     String
+  readAt         DateTime     @default(now())
+  Announcement   Announcement @relation(fields: [announcementId], references: [id])
+}
+
+// Document Management
+model DocumentItem {
+  id        String            @id @default(uuid())
+  name      String
+  type      String // 'FOLDER' | 'FILE'
+  parentId  String?
+  ownerId   String
+  versions  DocumentVersion[]
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  deletedAt DateTime?
+}
+
+model DocumentVersion {
+  id             String       @id @default(uuid())
+  documentItemId String
+  versionNumber  Int
+  s3ObjectKey    String
+  sizeBytes      BigInt
+  uploadById     String
+  isCurrent      Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  DocumentItem   DocumentItem @relation(fields: [documentItemId], references: [id])
+}
+
+// Dynamic Admin Central (JSONB)
+/// JSONB 動態表單註冊表：包含狀態鎖定與版本避免歷史資料污染。
+model DynamicTableDef {
+  id          String  @id @default(uuid())
+  tableCode   String  @unique
+  name        String
+  description String?
+  status      String  @default("DRAFT") // DRAFT (可修改), PUBLISHED (鎖死唯讀), ARCHIVED (停用)
+  version     Int     @default(1)
+
+  // 明細：真正的欄位與 UI 定義
+  fieldsSchema Json
+  uiSchema     Json?
+
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  records DynamicRecordMaster[]
+}
+
+/// 動態表單實體主檔 (Master-Detail Pattern)
+/// 主檔將共通屬性如處理狀態與擁有者抽出，建立正規化關聯與複合索引提升效能。餘下動態欄位放於 JSONB 明細中。
+model DynamicRecordMaster {
+  id         String @id @default(uuid())
+  tableDefId String
+
+  // 通用/共通屬性 (正規化主檔)
+  recordStatus     String  @default("PENDING") // e.g. PENDING, PROCESSING, COMPLETED, REJECTED
+  targetEmployeeId String?
+  ownerEmployeeId  String
+
+  // 明細：無正規化 JSONB 動態儲存區
+  dynamicData Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  DynamicTableDef DynamicTableDef @relation(fields: [tableDefId], references: [id])
+
+  @@index([dynamicData(ops: JsonbPathOps)], type: Gin)
+  @@index([ownerEmployeeId, recordStatus])
+  @@index([targetEmployeeId])
+}
+
+// Integration
+model IntegrationCredential {
+  id             String   @id @default(uuid())
+  employeeId     String
+  provider       String
+  externalUserId String
+  accessToken    String
+  refreshToken   String
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([employeeId, provider])
+}
+
+model ThirdPartyResourceMap {
+  id           String   @id @default(uuid())
+  resourceType String
+  internalId   String
+  externalId   String
+  provider     String
+  createdAt    DateTime @default(now())
+}
