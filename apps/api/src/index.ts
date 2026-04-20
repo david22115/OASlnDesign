@@ -11,7 +11,7 @@ import authRoutes from './routes/auth.routes';
 import dynamicAdminRoutes from './routes/dynamic_admin.routes';
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = Number(process.env.PORT) || 3001;
 
 // ========================================================
 // 基礎中介軟體配置 (Middleware)

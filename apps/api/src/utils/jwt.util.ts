@@ -11,7 +11,29 @@ import { v4 as uuidv4 } from 'uuid';
  */
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_super_secret_dev_key';
-const JWT_EXPIRES_IN = '1h'; // Access token 有效期預設 1 小時
+
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('[Security] JWT_SECRET must be set in production environment!');
+}
+export const JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN || '1h') as any; // Access token 有效期
+
+/**
+ * 輔助工具：將簡單的效期字串 (如 1h, 1d) 轉換為毫秒。
+ * 用於確保 Cookie maxAge 與 JWT expiresIn 絕對同步。
+ */
+export function getExpiresInMs(): number {
+  const value = String(JWT_EXPIRES_IN);
+  const unit = value.slice(-1);
+  const amount = parseInt(value, 10);
+  
+  switch (unit) {
+    case 'h': return amount * 60 * 60 * 1000;
+    case 'd': return amount * 24 * 60 * 60 * 1000;
+    case 'm': return amount * 60 * 1000;
+    case 's': return amount * 1000;
+    default: return 3600 * 1000; // Fallback to 1h
+  }
+}
 
 export interface AuthPayload {
   userId: string;

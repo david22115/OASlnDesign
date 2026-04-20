@@ -6,7 +6,8 @@ export default function Header({ user }: { user: any }) {
 
   const handleLogout = async () => {
     try {
-      await fetch('http://localhost:3001/api/auth/logout', { method: 'POST' }); 
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      await fetch(`${apiUrl}/api/auth/logout`, { method: 'POST' }); 
     } catch(e) {} // best-effort logout
     localStorage.removeItem('user');
     router.push('/login');

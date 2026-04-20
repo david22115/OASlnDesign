@@ -15,8 +15,8 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // 假設 API 運行在 3001 端口
-      const res = await fetch("http://localhost:3001/api/auth/login", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const res = await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employeeId, password }),

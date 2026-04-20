@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '@repo/database';
 import { comparePassword } from '../utils/password.util';
-import { signAccessToken } from '../utils/jwt.util';
+import { signAccessToken, getExpiresInMs } from '../utils/jwt.util';
 import { redis } from '../services/redis';
 import jwt from 'jsonwebtoken';
 
@@ -47,7 +47,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 3600 * 1000 // 1 hr 與 JWT 等長
+      maxAge: getExpiresInMs() // 與 JWT 等長
     });
 
     // 同時在 JSON 返回，以利 Mobile App 自行寫入 SecureStore
