@@ -48,9 +48,15 @@ app.get('/health', async (req, res) => {
 // ========================================================
 // 伺服器啟動與生命週期管理 (Lifecycle Hooks)
 // ========================================================
-const server = app.listen(port, () => {
+let server: any;
+
+if (process.env.NODE_ENV !== 'test') {
+  server = app.listen(port, () => {
     console.log(`[API Gateway] Server listening at http://localhost:${port}`);
-});
+  });
+}
+
+export default app;
 
 /**
  * 優雅關機機制 (Graceful Shutdown)
@@ -59,18 +65,23 @@ const server = app.listen(port, () => {
  */
 const shutdownHandler = async () => {
   console.log('\n[System] SIGINT/SIGTERM received. Triggering graceful shutdown...');
-  server.close(async () => {
-    try {
-      await gracefulShutdownQueues();
-      await prisma.$disconnect();
-      await redis.quit();
-      console.log('[System] All resources released. Exiting gracefully.');
-      process.exit(0);
-    } catch (err) {
-      console.error('[System] Error during shutdown:', err);
-      process.exit(1);
-    }
+  
+  const closeServer = () => new Promise((resolve) => {
+    if (server) server.close(resolve);
+    else resolve(true);
   });
+
+  try {
+    await closeServer();
+    await gracefulShutdownQueues();
+    await prisma.$disconnect();
+    await redis.quit();
+    console.log('[System] All resources released. Exiting gracefully.');
+    process.exit(0);
+  } catch (err) {
+    console.error('[System] Error during shutdown:', err);
+    process.exit(1);
+  }
 };
 
 process.on('SIGINT', shutdownHandler);
