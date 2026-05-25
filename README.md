@@ -96,3 +96,14 @@ cd apps/mobile
 pnpm run start
 ```
 From there, you can press `a` to run on an Android emulator, `i` to run on an iOS simulator, or scan the QR code with the Expo Go app on your physical device.
+
+## 🎯 Upcoming Goals & Roadmap
+
+As the project evolves, the following features and architectural improvements are planned:
+
+- **Complete Logging Mechanism:** Implement a centralized and comprehensive logging system (e.g., Winston/Pino + ELK stack or Datadog) for better observability and debugging.
+- **Containerization (Docker):** Dockerize all applications (`api`, `portal`, `admin`) to ensure isolated, consistent environments and seamless deployments.
+- **CI/CD Pipelines:** Set up automated testing, linting, and deployment workflows using GitHub Actions or GitLab CI.
+- **System Audit Logs:** Complete the integration of `SystemAuditLog` to track all administrative actions.
+- **Dashboard API Integration:** Connect the Portal Dashboard to real APIs for attendance, tasks, and announcements.
+- **Advanced Auth & ABAC:** Implement fine-grained Attribute-Based Access Control middlewares and secure refresh token rotation mechanisms.
